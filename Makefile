@@ -32,6 +32,7 @@ integration-test:
 		-t integration-test:latest \
 		-f test/integration/Dockerfile .
 	cd test/integration \
+		&& (docker-compose down || true) \
 		&& docker-compose up -d bureaucrat \
 		&& docker-compose up tester \
 		&& docker-compose down
