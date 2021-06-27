@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: main-svc
+  labels:
+    app: main-svc
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: main-svc
+  template:
+    metadata:
+      labels:
+        app: main-svc
+    spec:
+      containers:
+        - name: main-svc
+          # Should be set to the right container registry.
+          image: localhost:32000/main-svc:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 80
+              name: http-port
+          env:
+            - name: APP_PORT
+              value: "80"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: main-svc
+spec:
+  selector:
+    app: main-svc
+  ports:
+    - name: http
+      protocol: TCP
+      port: 8000
+      targetPort: 80
