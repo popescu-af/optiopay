@@ -111,6 +111,13 @@ The business logic, although trivial at the moment, uses an interface towards th
 
 ## Development View
 
+### Tools used (prerequisites)
+* GNU make
+* go
+* docker
+* docker-compose
+* kubectl
+
 ### Repository structure
 
 ```bash
@@ -119,24 +126,24 @@ $ tree
 ├── Dockerfile
 ├── Makefile
 ├── README.md
-├── cmd  # main app
+├── cmd                                 # main app
 │   └── main.go
-├── deploy  # K8s-related
+├── deploy                              # K8s-related
 │   └── main-svc.yaml
-├── doc  # documentation
+├── doc                                 # documentation
 │   ├── diagram
 │   │   └── logical-view.drawio
 │   └── img
 │       └── logical-view.png
 ├── go.mod
 ├── go.sum
-├── internal  # internal logic
+├── internal                            # internal logic
 │   ├── concretes
 │   │   ├── inmemorystorage.go
 │   │   └── inmemorystorage_test.go
 │   ├── config
 │   │   └── env.go
-│   ├── logic  # business logic
+│   ├── logic                           # business logic
 │   │   ├── errors.go
 │   │   ├── impl.go
 │   │   └── storage.go
@@ -144,16 +151,16 @@ $ tree
 │       ├── http_error_handler.go
 │       ├── http_router.go
 │       └── http_wrapper.go
-├── pkg  # exported
-│   ├── client  # exports for clients
+├── pkg                                 # exported
+│   ├── client                          # exports for clients
 │   │   └── client.go
-│   └── exports  # exported definitions
+│   └── exports                         # exported definitions
 │       ├── add_info.go
 │       ├── api.go
 │       ├── hierarchy_info.go
 │       ├── manager_info.go
 │       └── remove_info.go
-└── test  # tests other than unit tests
+└── test                                # tests other than unit tests
     └── integration
         ├── Dockerfile
         ├── docker-compose.yaml
@@ -163,7 +170,7 @@ $ tree
 ### Implementation Constraints
 
 * the employee directory is an in-memory structure
-* in the hierarchy, nodes point to children and not vice-versa
+* in the hierarchy, nodes point to their children and not to their parents
 * implementation in golang
 
 ### Implementation Assumptions
