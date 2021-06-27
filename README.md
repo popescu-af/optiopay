@@ -124,7 +124,7 @@ TODO: class diagram
 ### Building
 
 ```bash
-$ go build cmd/main.go
+$ make build
 ```
 
 ### Unit Testing
@@ -132,27 +132,29 @@ $ go build cmd/main.go
 For now, given that the business logic simply forwards the calls to the internal storage, the only unit tests written are for the concrete in-memory storage.
 
 ```bash
-$ go test -race ./internal/concretes/...
+$ make test
 ```
 
 ### Integration Testing
 
 ```bash
-$ # TODO
-```
-
-### Performance Testing
-
-```bash
-$ # TODO
+$ make integration-test
 ```
 
 ### Kubernetes deployment
 
+To deploy, simply call the following command. This assumes you have `kubectl` installed and a cluster at your disposal. This also assumes there is a docker registry running in the cluster and that it is port-forwarded locally to port `5000`.
+
 ```bash
-$ # TODO
+$ make deploy
+$ kubectl port-forward svc/main-svc 8000:8000
+
+# We can issue curl commands - like before, but in a different terminal -
+# to work with the service running in the Kubernetes cluster.
 ```
 
-### Further Improvements
-
-TODO
+### Further Work
+* more unit tests
+* more integration tests
+* health probes for orchestration purposes
+* performance testing

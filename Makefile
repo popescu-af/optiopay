@@ -8,15 +8,33 @@ PLATFORM?=linux/amd64
 .PHONY: build
 build:
 	GOOS=linux $(ARCH) go build -o main-svc -v cmd/main.go
+
+.PHONY: build-img
+build-img: build
 	docker buildx build --platform $(PLATFORM) -t main-svc:${BUILD_TAG} .
 
 .PHONY: tag
-tag: build
+tag: build-img
 	docker tag main-svc:${BUILD_TAG} main-svc:latest
 
 .PHONY: run
 run: tag
 	docker run -p 8000:80 -t main-svc:latest
+
+.PHONY: test
+test:
+	go test -race ./internal/concretes/...
+
+.PHONY: integration-test
+integration-test:
+	GOOS=linux $(ARCH) go build -o integration-test -v test/integration/main.go
+	docker buildx build --platform $(PLATFORM) \
+		-t integration-test:latest \
+		-f test/integration/Dockerfile .
+	cd test/integration \
+		&& docker-compose up -d bureaucrat \
+		&& docker-compose up tester \
+		&& docker-compose down
 
 .PHONY: publish
 publish: tag

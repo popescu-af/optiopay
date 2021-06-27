@@ -1,0 +1,8 @@
+version: "3.9"
+services:
+  bureaucrat:
+    image: "main-svc:latest"
+  tester:
+    image: "integration-test:latest"
+    depends_on:
+      - "bureaucrat"
