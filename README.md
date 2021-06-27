@@ -42,30 +42,48 @@ To implement the above mentioned scenarios, a few HTTP REST APIs are exposed.
 
 ##### Body Format
 
+```json
+{
+    "employee_name": "Tom",
+    "manager_name": "Alex"
+}
+```
+
 ##### curl Example
 
 ```bash
-$ curl # TODO
+# assuming the instance is serving localhost:8000
+$ curl localhost:8000/add -d'{"employee_name": "Tom", "manager_name": "Alex"}'
 ```
 
 #### POST /remove
 
 ##### Body Format
 
+```json
+{
+    "employee_name": "Alex",
+    "manager_taking_over": "Richard"
+}
+```
+
 ##### curl Example
 
 ```bash
-$ curl # TODO
+$ curl localhost:8000/remove -d'{"employee_name": "Alex", "manager_taking_over": "Richard"}'
 ```
 
 #### GET /manager
 
-##### Path Format
+##### Headers
+
+This request requires two headers, resulting in a lookup error if they are omitted.
+The headers are `first_employee` and `second_employee`.
 
 ##### curl Example
 
 ```bash
-$ curl # TODO
+$ curl localhost:8000/manager -H "first_employee: Stephanie" -H "second_employee: Tom"
 ```
 
 #### GET /hierarchy
@@ -73,12 +91,19 @@ $ curl # TODO
 ##### curl Example
 
 ```bash
-$ curl # TODO
+# with jq (if installed), or not
+$ curl localhost:8000/hierarchy | jq
 ```
 
 ### Storage
 
-TODO
+The storage implementation is a simple, in-memory one. It uses a simple n-ary tree to hold the hierarchy. It augments the tree with a map, to achieve lookups constant time.
+
+Calculating the common manager of two employees is done in linear time.
+
+Thread safety is achieved by means of a read/write mutex.
+
+The business logic, although trivial at the moment, uses an interface towards the storage so that the storage technology can easily be swapped based on needs (PSQL, etc.).
 
 ## Logical View
 
@@ -99,13 +124,15 @@ TODO: class diagram
 ### Building
 
 ```bash
-$ # TODO
+$ go build cmd/main.go
 ```
 
 ### Unit Testing
 
+For now, given that the business logic simply forwards the calls to the internal storage, the only unit tests written are for the concrete in-memory storage.
+
 ```bash
-$ # TODO
+$ go test -race ./internal/concretes/...
 ```
 
 ### Integration Testing

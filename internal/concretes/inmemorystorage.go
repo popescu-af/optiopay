@@ -40,10 +40,6 @@ func (i *InMemoryStorage) AddEmployee(employeeName, managerName string) error {
 		return logic.NewNotFoundError(fmt.Sprintf("employee named '%s' does not exist", managerName))
 	}
 
-	if _, ok := manager.Managed[employeeName]; ok {
-		return logic.NewAlreadyFoundError(fmt.Sprintf("employee named '%s' is already managed by '%s'", employeeName, managerName))
-	}
-
 	i.lookup[employeeName] = &logic.Employee{
 		Name:    employeeName,
 		Managed: make(map[string]*logic.Employee),
@@ -68,13 +64,10 @@ func (i *InMemoryStorage) RemoveEmployee(employeeName, managerTakingOverName str
 
 	managerTakingOver, ok := i.lookup[managerTakingOverName]
 	if !ok {
-		return logic.NewNotFoundError(fmt.Sprintf("employee named '%s' to take over employees does not exist", managerTakingOverName))
+		return logic.NewNotFoundError(fmt.Sprintf("employee named '%s' does not exist", managerTakingOverName))
 	}
 
-	managersOfManagerTakingOver, err := i.path(managerTakingOverName)
-	if err != nil {
-		return err
-	}
+	managersOfManagerTakingOver, _ := i.path(managerTakingOverName)
 
 	for _, m := range managersOfManagerTakingOver {
 		if m.Name == employeeName {
@@ -82,21 +75,15 @@ func (i *InMemoryStorage) RemoveEmployee(employeeName, managerTakingOverName str
 		}
 	}
 
-	managersOfEmployee, err := i.path(employeeName)
-	if err != nil {
-		return err
-	}
-
-	countManagers := len(managersOfEmployee)
-	if countManagers == 0 {
-		return logic.NewArgumentError("cannot remove ceo")
-	}
+	managersOfEmployee, _ := i.path(employeeName)
 
 	for k, v := range employee.Managed {
 		managerTakingOver.Managed[k] = v
 	}
 
 	delete(i.lookup, employeeName)
+
+	countManagers := len(managersOfEmployee)
 	delete(managersOfEmployee[countManagers-1].Managed, employeeName)
 	return nil
 }
@@ -167,8 +154,12 @@ func (i *InMemoryStorage) path(employeeName string) ([]*logic.Employee, error) {
 		t := stack[len(stack)-1]
 		if t.employee.Name == employeeName {
 			var result []*logic.Employee
-			for ; t.parent != nil; t = t.parent {
+			for {
 				result = append(result, t.employee)
+				if t.parent == nil {
+					break
+				}
+				t = t.parent
 			}
 			for i := 0; i < len(result)/2; i++ {
 				temp := result[i]
