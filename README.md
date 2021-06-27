@@ -204,6 +204,7 @@ $ kubectl port-forward svc/main-svc 8000:8000
 
 ### Further Work
 * more unit tests
-* more integration tests
+* more thorough integration tests
 * health probes for orchestration purposes
-* performance testing
+* performance testing (e.g. with locust)
+* more APIs for getting info about an employee, etc.
