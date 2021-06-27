@@ -1,7 +1,10 @@
 package exports
 
+type Employee struct {
+	Managed map[string]*Employee `json:"manages"`
+}
+
 // HierarchyInfo - generated API structure
 type HierarchyInfo struct {
-	Pretty string `json:"pretty"`
-	JSON   string `json:"json"`
+	Data *Employee `json:"Claire"`
 }

@@ -92,6 +92,10 @@ TODO: class diagram
 * in the hierarchy, nodes point to children and not vice-versa
 * implementation in golang
 
+### Implementation Assumptions
+
+* if employee E0 manages employee E1, their least senior common manager is the employee immediately above E0, if they exist, otherwise E0
+
 ### Building
 
 ```bash

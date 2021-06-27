@@ -6,6 +6,7 @@ import (
 
 	"github.com/popescu-af/saas-y/pkg/log"
 
+	"github.com/popescu-af/optiopay/services/main-svc/internal/concretes"
 	"github.com/popescu-af/optiopay/services/main-svc/internal/config"
 	"github.com/popescu-af/optiopay/services/main-svc/internal/logic"
 	"github.com/popescu-af/optiopay/services/main-svc/internal/service"
@@ -21,7 +22,7 @@ func main() {
 		log.Fatal(err.Error())
 	}
 
-	impl := logic.NewImpl()
+	impl := logic.NewImpl(concretes.NewInMemoryStorage())
 	httpWrapper := service.NewHTTPWrapper(impl)
 	router := service.NewRouter(httpWrapper.Paths())
 

@@ -1,8 +1,6 @@
 package logic
 
 import (
-	"errors"
-
 	"github.com/popescu-af/saas-y/pkg/log"
 
 	"github.com/popescu-af/optiopay/services/main-svc/pkg/exports"
@@ -10,11 +8,14 @@ import (
 
 // Implementation is the main implementation of the API interface.
 type Implementation struct {
+	storage Storage
 }
 
 // NewImpl creates an instance of the main implementation.
-func NewImpl() exports.API {
-	return &Implementation{}
+func NewImpl(storage Storage) exports.API {
+	return &Implementation{
+		storage: storage,
+	}
 }
 
 // /add
@@ -22,7 +23,7 @@ func NewImpl() exports.API {
 // AddEmployee implementation.
 func (i *Implementation) AddEmployee(input *exports.AddInfo) error {
 	log.Info("called add_employee")
-	return errors.New("method 'add_employee' not implemented")
+	return i.storage.AddEmployee(input.EmployeeName, input.ManagerName)
 }
 
 // /remove
@@ -30,7 +31,7 @@ func (i *Implementation) AddEmployee(input *exports.AddInfo) error {
 // RemoveEmployee implementation.
 func (i *Implementation) RemoveEmployee(input *exports.RemoveInfo) error {
 	log.Info("called remove_employee")
-	return errors.New("method 'remove_employee' not implemented")
+	return i.storage.RemoveEmployee(input.EmployeeName, input.ManagerTakingOver)
 }
 
 // /manager
@@ -38,7 +39,11 @@ func (i *Implementation) RemoveEmployee(input *exports.RemoveInfo) error {
 // Manager implementation.
 func (i *Implementation) Manager(firstEmployee string, secondEmployee string) (*exports.ManagerInfo, error) {
 	log.Info("called manager")
-	return nil, errors.New("method 'manager' not implemented")
+	managerName, err := i.storage.Manager(firstEmployee, secondEmployee)
+	if err != nil {
+		return nil, err
+	}
+	return &exports.ManagerInfo{Name: managerName}, nil
 }
 
 // /hierarchy
@@ -46,5 +51,7 @@ func (i *Implementation) Manager(firstEmployee string, secondEmployee string) (*
 // Hierarchy implementation.
 func (i *Implementation) Hierarchy() (*exports.HierarchyInfo, error) {
 	log.Info("called hierarchy")
-	return nil, errors.New("method 'hierarchy' not implemented")
+	return &exports.HierarchyInfo{
+		Data: i.storage.Hierarchy(),
+	}, nil
 }
