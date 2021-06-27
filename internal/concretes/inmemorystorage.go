@@ -71,7 +71,16 @@ func (i *InMemoryStorage) RemoveEmployee(employeeName, managerTakingOverName str
 		return logic.NewNotFoundError(fmt.Sprintf("employee named '%s' to take over employees does not exist", managerTakingOverName))
 	}
 
-	// TODO: check that manager taking over is not managed by the employee being removed
+	managersOfManagerTakingOver, err := i.path(managerTakingOverName)
+	if err != nil {
+		return err
+	}
+
+	for _, m := range managersOfManagerTakingOver {
+		if m.Name == employeeName {
+			return logic.NewArgumentError(fmt.Sprintf("manager taking '%s' over is managed by employee '%s'", managerTakingOverName, employeeName))
+		}
+	}
 
 	managersOfEmployee, err := i.path(employeeName)
 	if err != nil {
@@ -141,7 +150,42 @@ func (i *InMemoryStorage) copy(employee *logic.Employee) *exports.Employee {
 	return result
 }
 
-func (i *InMemoryStorage) path(employeeName string) ([]*logic.Employee, error) {
+type traverse struct {
+	parent   *traverse
+	employee *logic.Employee
+}
 
-	return nil, nil
+func (i *InMemoryStorage) path(employeeName string) ([]*logic.Employee, error) {
+	var stack []*traverse
+
+	stack = append(stack, &traverse{
+		parent:   nil,
+		employee: i.ceo,
+	})
+
+	for len(stack) > 0 {
+		t := stack[len(stack)-1]
+		if t.employee.Name == employeeName {
+			var result []*logic.Employee
+			for ; t.parent != nil; t = t.parent {
+				result = append(result, t.employee)
+			}
+			for i := 0; i < len(result)/2; i++ {
+				temp := result[i]
+				result[i] = result[len(result)-i-1]
+				result[len(result)-i-1] = temp
+			}
+			return result[:len(result)-1], nil
+		}
+		stack = stack[:len(stack)-1]
+
+		for _, v := range t.employee.Managed {
+			stack = append(stack, &traverse{
+				parent:   t,
+				employee: v,
+			})
+		}
+	}
+
+	return nil, logic.NewNotFoundError(fmt.Sprintf("employee named '%s' does not exist", employeeName))
 }

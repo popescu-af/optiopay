@@ -52,6 +52,6 @@ func (i *Implementation) Manager(firstEmployee string, secondEmployee string) (*
 func (i *Implementation) Hierarchy() (*exports.HierarchyInfo, error) {
 	log.Info("called hierarchy")
 	return &exports.HierarchyInfo{
-		Data: i.storage.Hierarchy(),
+		CEO: i.storage.Hierarchy(),
 	}, nil
 }

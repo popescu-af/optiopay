@@ -6,5 +6,5 @@ type Employee struct {
 
 // HierarchyInfo - generated API structure
 type HierarchyInfo struct {
-	Data *Employee `json:"Claire"`
+	CEO *Employee `json:"CEO"`
 }
